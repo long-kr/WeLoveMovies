@@ -10,9 +10,8 @@ This is solution code for WeLoveMovies project.
 5. Run npx knex seed:run ( to seed data )
 
 ### API endpoint:
-| Syntax | Description |
-| ----------- | ----------- |
 | Endpoint | return |
+| ----------- | ----------- |
 | Get /movies | respone with list of all movies |
 | GET /movies?is_showing=true | return only those movies where the movie is currently showing in theaters |
 | GET /movies/:movieId | return detail of movie id |
