@@ -4,10 +4,10 @@ This is solution code for WeLoveMovies project.
 
 ### Instruction to install locally:
 1. Fork and Clone this repository
-2. Update .env file with a connection URL or localhost
-3. Run npm i ( read package.json for details packages )
-4. Run npx knex migrate:latest ( to migrate database )
-5. Run npx knex seed:run ( to seed data )
+2. Update `.env` file with a connection URL or localhost
+3. Run `npm i` ( read package.json for details packages )
+4. Run `npx knex migrate:latest` ( to migrate database )
+5. Run `npx knex seed:run` ( to seed data )
 
 ### API endpoint:
 | Endpoint | return |
