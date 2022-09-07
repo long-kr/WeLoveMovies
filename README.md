@@ -12,7 +12,7 @@ This is solution code for WeLoveMovies project.
 ### API endpoint:
 | Endpoint | return |
 | ----------- | ----------- |
-| Get /movies | respone with list of all movies |
+| GET /movies | respone with list of all movies |
 | GET /movies?is_showing=true | return only those movies where the movie is currently showing in theaters |
 | GET /movies/:movieId | return detail of movie id |
 | GET /movies/:movieId/theaters | return all the theaters where the movie is playing |
