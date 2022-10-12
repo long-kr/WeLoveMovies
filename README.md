@@ -1,6 +1,6 @@
 # we-love-movies-project
-
-This is solution code for WeLoveMovies project. 
+Live: `https://pure-eyrie-74674.herokuapp.com/movies`
+This is source code for WeLoveMovies project. 
 
 ### Instruction to install locally:
 1. Fork and Clone this repository
