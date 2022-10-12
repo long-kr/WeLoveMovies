@@ -2,6 +2,7 @@
 Live: `https://pure-eyrie-74674.herokuapp.com/movies`
 
 This is source code for WeLoveMovies project. 
+Built with JavaScript, Node.js, Express.js, Chai, Jasmine, PostgreSQL, Knex, and Cors.
 
 ### Instruction to install locally:
 1. Fork and Clone this repository
