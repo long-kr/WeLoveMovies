@@ -11,9 +11,9 @@ function list () {
 function listShowing () {
     return knex("movies as m")
         .join("movies_theaters as mt", "m.movie_id", "mt.movie_id")
-        .select("m.title", "m.movie_id", "mt.is_showing")
+        .select("m.title", "m.movie_id", "mt.is_showing", "m.image_url" )
         .where({ "mt.is_showing": true})
-        .groupBy("m.title", "m.movie_id", "mt.is_showing")
+        .groupBy("m.title", "m.movie_id", "mt.is_showing", "m.image_url")
 };
 
 //read a movies
