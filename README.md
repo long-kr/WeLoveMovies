@@ -1,5 +1,4 @@
 # we-love-movies-project
-API: `https://pure-eyrie-74674.herokuapp.com/movies`
 Live: `https://starter-movie-front-end-tau.vercel.app/`
 
 This is source code for WeLoveMovies project. 
