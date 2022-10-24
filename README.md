@@ -1,4 +1,4 @@
-# we-love-movies-project
+# We Love Movies
 Live: `https://starter-movie-front-end-tau.vercel.app/`
 
 This is source code for WeLoveMovies project. 
