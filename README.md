@@ -1,5 +1,6 @@
 # we-love-movies-project
-Live: `https://pure-eyrie-74674.herokuapp.com/movies`
+API: `https://pure-eyrie-74674.herokuapp.com/movies`
+Liev: `https://starter-movie-front-end-tau.vercel.app/`
 
 This is source code for WeLoveMovies project. 
 Built with JavaScript, Node.js, Express.js, Chai, Jasmine, PostgreSQL, Knex, and Cors.
