@@ -3,7 +3,7 @@ const path = require("path");
 require("dotenv").config();
 
 const {
-  NODE_ENV = "development",
+  NODE_ENV = "production",
   DEVELOPMENT_DATABASE_URL,
   PRODUCTION_DATABASE_URL,
 } = process.env;
