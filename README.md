@@ -1,8 +1,10 @@
 # We Love Movies
 Live: [https://welovemovie.netlify.app/](https://welovemovie.netlify.app/)
+Backend is hosted serverless, please give server a minute to spin up ;)
 
 This is source code for WeLoveMovies project. 
 Built with JavaScript, Node.js, Express.js, Chai, Jasmine, PostgreSQL, Knex, and Cors.
+
 
 ### Instruction to install locally:
 1. Fork and Clone this repository
