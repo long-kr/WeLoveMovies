@@ -1,5 +1,5 @@
 # We Love Movies
-Live: `[https://starter-movie-front-end-tau.vercel.app/](https://welovemovie.netlify.app/movies)`
+Live: [https://starter-movie-front-end-tau.vercel.app/](https://welovemovie.netlify.app/movies)
 
 This is source code for WeLoveMovies project. 
 Built with JavaScript, Node.js, Express.js, Chai, Jasmine, PostgreSQL, Knex, and Cors.
