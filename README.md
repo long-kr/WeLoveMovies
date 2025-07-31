@@ -1,5 +1,6 @@
 # We Love Movies
-Live: [https://welovemovie.netlify.app/](https://welovemovie.netlify.app/)
+Live: [https://welovemovie.netlify.app/](https://welovemovie.netlify.app/).
+
 Backend is hosted serverless, please give server a minute to spin up ;)
 
 This is source code for WeLoveMovies project. 
@@ -23,7 +24,6 @@ Built with JavaScript, Node.js, Express.js, Chai, Jasmine, PostgreSQL, Knex, and
 | GET /movies/:movieId/reviews | return all the reviews for the movie |
 | GET /theaters | return all the theaters |
 | PUT /reviews/:reviewId | This route will allow you to partially or fully update a review |
-| DELETE /reviews/:reviewId | This route will delete a review by ID |
 
 ### Homepage
 ![Screenshot 2022-10-24 015929](https://user-images.githubusercontent.com/57731304/197466280-0bf117d8-9dd0-41b3-b4e7-6dfafc3aa839.jpg)
