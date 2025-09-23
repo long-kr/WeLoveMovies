@@ -2,6 +2,7 @@ if (process.env.USER) require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { rateLimit } = require("express-rate-limit");
+const helmet = require("helmet").default;
 
 const notFound = require('./error/notFound');
 const errorHandler = require("./error/errorHandler");
@@ -24,9 +25,15 @@ const limiter = rateLimit({
 // Apply rate limiting to all routes
 app.use(limiter);
 
+// Add Helmet middleware for security headers
+app.use(helmet());
+
 app.options("*", cors());
 app.use(cors());
-app.use(express.json());
+
+// Add request size limits
+app.use(express.json({ limit: '10kb' })); // Limit JSON payload size to 10kb
+app.use(express.urlencoded({ extended: true, limit: '10kb' })); // Limit URL-encoded payload size
 
 app.use("/movies", moviesRouter);
 app.use("/theaters", theatersRouter);
