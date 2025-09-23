@@ -1,6 +1,7 @@
 if (process.env.USER) require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const { rateLimit } = require("express-rate-limit");
 
 const notFound = require('./error/notFound');
 const errorHandler = require("./error/errorHandler");
@@ -10,6 +11,18 @@ const reviewsRouter = require('./reviews/reviews.router');
 
 
 const app = express();
+
+// Define rate limit configurations
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later.",
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+// Apply rate limiting to all routes
+app.use(limiter);
 
 app.options("*", cors());
 app.use(cors());
