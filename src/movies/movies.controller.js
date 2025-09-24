@@ -1,32 +1,45 @@
 const service = require('./movies.service');
 const asyncErrorBoundary = require('../error/asyncErrorBoundary');
+const { NotFoundError, ValidationError, DatabaseError } = require('../error/CustomError');
 
-async function list (req, res, next) {
-    const isShowing = await req.query.is_showing;
+async function list(req, res) {
+    const isShowing = req.query.is_showing;
 
-    if(isShowing === "true") {
-        return res.json({ data: await service.listShowing() });
+    try {
+        const data = isShowing === "true" 
+            ? await service.listShowing()
+            : await service.list();
+        res.json({ data });
+    } catch (error) {
+        throw new DatabaseError('Error retrieving movies list');
     }
-
-    res.json({ data : await service.list()});
-};
+}
 
 async function hasMovie(req, res, next) {
     const { movieId } = req.params;
-    const movie = await service.read(movieId);
+    
+    if (!movieId) {
+        throw new ValidationError('MovieId is required');
+    }
 
-    if(movie) {
+    try {
+        const movie = await service.read(movieId);
+        if (!movie) {
+            throw new NotFoundError('Movie cannot be found');
+        }
+        res.locals.movie = movie;
         return next();
-    };
-
-    next({
-        status: 404,
-        message: "Movie cannot be found"
-    });
-};
+    } catch (error) {
+        if (error instanceof NotFoundError) {
+            throw error;
+        }
+        throw new DatabaseError('Error checking movie existence');
+    }
+}
 
 async function read(req, res) {
-    res.json({ data: await service.read(req.params.movieId) });
+    
+    res.json({ data: res.locals.movie });
 };
 
 async function readMovieTheaters(req, res) {

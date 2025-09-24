@@ -1,53 +1,64 @@
 const service = require("./reviews.service");
 const asyncError = require("../error/asyncErrorBoundary");
+const { NotFoundError, ValidationError, DatabaseError } = require('../error/CustomError');
 
 async function hasReview(req, res, next) {
     const { reviewId } = req.params;
-    const review = await service.read(reviewId);
-
-    if(review) {
-        res.locals.review = review;
-        return next();
+    
+    if (!reviewId) {
+        throw new ValidationError('ReviewId is required');
     }
 
-    next({
-        status: 404,
-        message: "Review cannot be found"
-    })
-};
+    try {
+        const review = await service.read(reviewId);
+        if (!review) {
+            throw new NotFoundError('Review cannot be found');
+        }
+        res.locals.review = review;
+        return next();
+    } catch (error) {
+        if (error instanceof NotFoundError) {
+            throw error;
+        }
+        throw new DatabaseError('Error checking review existence');
+    }
+}
 
-function mustHasProperties (propertyName) {
+function mustHasProperties(propertyName) {
     return (req, res, next) => {
         const { data } = req.body;
 
-        if(!data[propertyName]) {
-            console.log("1")
-            return next({
-                status: 400,
-                message: `Update body must have ${propertyName}`
-            })
-        };
+        if (!data) {
+            throw new ValidationError('Request body must include data object');
+        }
+
+        if (!data[propertyName]) {
+            throw new ValidationError(`Update body must have ${propertyName}`);
+        }
 
         next();
     };
-};
+}
 
-function validProperties (req, res, next) {
+function validProperties(req, res, next) {
     const { data } = req.body;
 
-    const valid_Properties = [
+    if (!data) {
+        throw new ValidationError('Request body must include data object');
+    }
+
+    const validProperties = [
         "content",
         "score",
-    ]
+    ];
 
-    const invalidField = Object.keys(data).filter((key) => {
-        return !valid_Properties.includes(key);
-    });
+    const invalidFields = Object.keys(data).filter(key => !validProperties.includes(key));
 
-    if(invalidField.length){
-        return next({
-            status: 400,
-            message: `Invalid field(s): ${invalidField.join(", ")}`
+    if (invalidFields.length) {
+        throw new ValidationError(`Invalid field(s): ${invalidFields.join(", ")}`);
+    }
+
+    next();
         })
     };
 
