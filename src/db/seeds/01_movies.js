@@ -23,7 +23,7 @@ exports.seed = function (knex) {
       runtime_in_minutes: 112,
       rating: "PG",
       description:
-        'Professional photographer L.B. "Jeff" Jefferies breaks his leg while getting an action shot at an auto race. Confined to his New York apartment, he spends his time looking out of the rear window observing the neighbors. He begins to suspect that a man across the courtyard may have murdered his wife. Jeff enlists the help of his high society fashion-consultant girlfriend Lisa Freemont and his visiting nurse Stella to investigate...',
+        "Professional photographer L.B. \"Jeff\" Jefferies breaks his leg while getting an action shot at an auto race. Confined to his New York apartment, he spends his time looking out of the rear window observing the neighbors. He begins to suspect that a man across the courtyard may have murdered his wife. Jeff enlists the help of his high society fashion-consultant girlfriend Lisa Freemont and his visiting nurse Stella to investigate...",
       image_url:
         "https://m.media-amazon.com/images/M/MV5BNGUxYWM3M2MtMGM3Mi00ZmRiLWE0NGQtZjE5ODI2OTJhNTU0XkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_Ratio0.6716_AL_.jpg",
     },
@@ -104,7 +104,7 @@ exports.seed = function (knex) {
       runtime_in_minutes: 132,
       rating: "R",
       description:
-        'In the year 2032, Evey Hammond is an average citizen of the United Kingdom, which is under the rule of the fascist and tyrannical Norsefire Party. She is an employee of the state-run British Television Network, but soon, she becomes the number one enemy of the state together with an enigmatic and larger-than-life freedom fighter known only by the letter "V"...',
+        "In the year 2032, Evey Hammond is an average citizen of the United Kingdom, which is under the rule of the fascist and tyrannical Norsefire Party. She is an employee of the state-run British Television Network, but soon, she becomes the number one enemy of the state together with an enigmatic and larger-than-life freedom fighter known only by the letter \"V\"...",
       image_url:
         "https://m.media-amazon.com/images/M/MV5BOTI5ODc3NzExNV5BMl5BanBnXkFtZTcwNzYxNzQzMw@@._V1_Ratio0.6791_AL_.jpg",
     },
@@ -122,7 +122,7 @@ exports.seed = function (knex) {
       runtime_in_minutes: 117,
       rating: "PG-13",
       description:
-        'In the twenty-first century, a corporation develops androids to be used as slaves in colonies outside of the Earth, identified as "replicants". In 2019, a former Police Officer is hired to hunt down a fugitive group of replicants living undercover in Los Angeles, California...',
+        "In the twenty-first century, a corporation develops androids to be used as slaves in colonies outside of the Earth, identified as \"replicants\". In 2019, a former Police Officer is hired to hunt down a fugitive group of replicants living undercover in Los Angeles, California...",
       image_url:
         "https://m.media-amazon.com/images/M/MV5BNzQzMzJhZTEtOWM4NS00MTdhLTg0YjgtMjM4MDRkZjUwZDBlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_Ratio0.6791_AL_.jpg",
     },
