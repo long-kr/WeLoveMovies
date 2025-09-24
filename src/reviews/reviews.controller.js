@@ -1,94 +1,58 @@
 const service = require("./reviews.service");
 const asyncError = require("../error/asyncErrorBoundary");
+const { NotFoundError, ValidationError, DatabaseError } = require("../error/CustomError");
+const { createValidationMiddleware, schemas } = require("../utils/validation");
 
+/**
+ * Middleware to check if review exists
+ */
 async function hasReview(req, res, next) {
-    const { reviewId } = req.params;
+  const { reviewId } = req.params;
+    
+  if (!reviewId) {
+    throw new ValidationError("ReviewId is required");
+  }
+
+  try {
     const review = await service.read(reviewId);
-
-    if(review) {
-        res.locals.review = review;
-        return next();
+    if (!review) {
+      throw new NotFoundError("Review cannot be found");
     }
+    res.locals.review = review;
+    return next();
+  } catch (error) {
+    if (error instanceof NotFoundError) {
+      throw error;
+    }
+    throw new DatabaseError("Error checking review existence");
+  }
+}
 
-    next({
-        status: 404,
-        message: "Review cannot be found"
-    })
-};
-
-function mustHasProperties (propertyName) {
-    return (req, res, next) => {
-        const { data } = req.body;
-
-        if(!data[propertyName]) {
-            console.log("1")
-            return next({
-                status: 400,
-                message: `Update body must have ${propertyName}`
-            })
-        };
-
-        next();
-    };
-};
-
-function validProperties (req, res, next) {
-    const { data } = req.body;
-
-    const valid_Properties = [
-        "content",
-        "score",
-    ]
-
-    const invalidField = Object.keys(data).filter((key) => {
-        return !valid_Properties.includes(key);
-    });
-
-    if(invalidField.length){
-        return next({
-            status: 400,
-            message: `Invalid field(s): ${invalidField.join(", ")}`
-        })
-    };
-
-    next(); 
-};
-
-function validScore(req, res, next) {
-    const { data } = req.body;
-
-    if(isNaN(data.score)) {
-        return next({
-            status: 400,
-            message: `Score input must be a Number`
-        })
-    };
-
-    next();
-};
-
+/**
+ * Update a review
+ */
 async function update(req, res) {
+  try {
     const updatedReview = {
-        ...req.body.data,
-        review_id: res.locals.review.review_id,
+      ...req.body.data,
+      review_id: res.locals.review.review_id,
     };
-    
-    const updated = await service.update(updatedReview);
+        
+    await service.update(updatedReview);
     const data = await service.returnUpdate(res.locals.review.review_id);
-    
     res.json({ data });
-};
+  } catch (error) {
+    throw new DatabaseError("Failed to update review");
+  }
+}
 
-async function destroy(req, res) {
-    const deletedReview = await service.destroy(res.locals.review.review_id);
-    res.sendStatus(204);
-};
+
 
 module.exports = {
-    update: [
-                asyncError(hasReview),
-                validProperties,
-                asyncError(update)
-            ],
-    delete: [ asyncError(hasReview), asyncError(destroy) ]
-}
+  update: [
+    asyncError(hasReview),
+    createValidationMiddleware(schemas.reviewUpdate),
+    asyncError(update)
+  ],
+  
+};
