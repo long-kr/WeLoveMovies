@@ -10,9 +10,10 @@ class CustomError extends Error {
 }
 
 class ValidationError extends CustomError {
-  constructor(message) {
+  constructor(message, fields) {
     super(400, message);
     this.name = "ValidationError";
+    this.fields = fields
   }
 }
 
