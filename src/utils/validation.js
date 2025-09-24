@@ -65,10 +65,10 @@ function createValidationMiddleware(schema) {
 
     // Validate anyOf fields (at least one must be present)
     if (schema.anyOf) {
-      const hasAnyRequired = schema.anyOf.some(field => 
+      const hasAnyRequired = schema.anyOf.some(field =>
         data[field] !== undefined && data[field] !== null && data[field] !== ""
       );
-      
+
       if (!hasAnyRequired) {
         errors.push(`At least one of these fields must be present: ${schema.anyOf.join(", ")}`);
       }
@@ -139,7 +139,7 @@ function createValidationMiddleware(schema) {
     }
 
     if (errors.length > 0) {
-      throw new ValidationError(errors.join("; "));
+      throw new ValidationError(errors.join("; "), schema.anyOf);
     }
 
     next();
