@@ -4,11 +4,11 @@ const cors = require("cors");
 const { rateLimit } = require("express-rate-limit");
 const helmet = require("helmet").default;
 
-const notFound = require('./error/notFound');
+const notFound = require("./error/notFound");
 const errorHandler = require("./error/errorHandler");
-const theatersRouter = require('./theaters/theaters.router');
-const moviesRouter = require('./movies/movies.router');
-const reviewsRouter = require('./reviews/reviews.router');
+const theatersRouter = require("./theaters/theaters.router");
+const moviesRouter = require("./movies/movies.router");
+const reviewsRouter = require("./reviews/reviews.router");
 
 
 const app = express();
@@ -32,8 +32,8 @@ app.options("*", cors());
 app.use(cors());
 
 // Add request size limits
-app.use(express.json({ limit: '10kb' })); // Limit JSON payload size to 10kb
-app.use(express.urlencoded({ extended: true, limit: '10kb' })); // Limit URL-encoded payload size
+app.use(express.json({ limit: "10kb" })); // Limit JSON payload size to 10kb
+app.use(express.urlencoded({ extended: true, limit: "10kb" })); // Limit URL-encoded payload size
 
 app.use("/movies", moviesRouter);
 app.use("/theaters", theatersRouter);

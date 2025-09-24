@@ -1,4 +1,4 @@
-const { ValidationError } = require('../error/CustomError');
+const { ValidationError } = require("../error/CustomError");
 
 /**
  * @typedef {Object.<string, any>} Data
@@ -51,13 +51,13 @@ function createValidationMiddleware(schema) {
     const { data } = req.body;
 
     if (!data) {
-      throw new ValidationError('Request body must include data object');
+      throw new ValidationError("Request body must include data object");
     }
 
     // Validate required fields
     if (schema.required) {
       schema.required.forEach(field => {
-        if (data[field] === undefined || data[field] === null || data[field] === '') {
+        if (data[field] === undefined || data[field] === null || data[field] === "") {
           errors.push(`${field} is required`);
         }
       });
@@ -66,11 +66,11 @@ function createValidationMiddleware(schema) {
     // Validate anyOf fields (at least one must be present)
     if (schema.anyOf) {
       const hasAnyRequired = schema.anyOf.some(field => 
-        data[field] !== undefined && data[field] !== null && data[field] !== ''
+        data[field] !== undefined && data[field] !== null && data[field] !== ""
       );
       
       if (!hasAnyRequired) {
-        errors.push(`At least one of these fields must be present: ${schema.anyOf.join(', ')}`);
+        errors.push(`At least one of these fields must be present: ${schema.anyOf.join(", ")}`);
       }
     }
 
@@ -87,7 +87,7 @@ function createValidationMiddleware(schema) {
           }
 
           // Number range validation
-          if (rules.type === 'number' && typeof value === 'number') {
+          if (rules.type === "number" && typeof value === "number") {
             if (rules.min !== undefined && value < rules.min) {
               errors.push(`${field} must be greater than or equal to ${rules.min}`);
             }
@@ -100,7 +100,7 @@ function createValidationMiddleware(schema) {
           }
 
           // String length validation
-          if (rules.type === 'string' && typeof value === 'string') {
+          if (rules.type === "string" && typeof value === "string") {
             if (rules.minLength && value.length < rules.minLength) {
               errors.push(`${field} must be at least ${rules.minLength} characters long`);
             }
@@ -122,7 +122,7 @@ function createValidationMiddleware(schema) {
                 errors.push(rules.message || `${field} is invalid`);
               }
             } catch (err) {
-              errors.push(err instanceof Error ? err.message : 'Validation error');
+              errors.push(err instanceof Error ? err.message : "Validation error");
             }
           }
         }
@@ -134,12 +134,12 @@ function createValidationMiddleware(schema) {
       const allowedFields = [...(schema.required || []), ...Object.keys(schema.fields || {})];
       const unknownFields = Object.keys(data).filter(field => !allowedFields.includes(field));
       if (unknownFields.length > 0) {
-        errors.push(`Unknown field(s): ${unknownFields.join(', ')}`);
+        errors.push(`Unknown field(s): ${unknownFields.join(", ")}`);
       }
     }
 
     if (errors.length > 0) {
-      throw new ValidationError(errors.join('; '));
+      throw new ValidationError(errors.join("; "));
     }
 
     next();
@@ -151,15 +151,15 @@ function createValidationMiddleware(schema) {
  */
 const schemas = {
   reviewUpdate: {
-    anyOf: ['content', 'score'],  // At least one of these must be present
+    anyOf: ["content", "score"],  // At least one of these must be present
     fields: {
       content: {
-        type: 'string',
+        type: "string",
         minLength: 1,
         maxLength: 1000
       },
       score: {
-        type: 'number',
+        type: "number",
         min: 1,
         max: 5,
         integer: true
