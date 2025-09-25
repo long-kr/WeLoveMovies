@@ -8,11 +8,11 @@ const limiter = rateLimit({
   handler: (_, __, next) => {
     next({
       message: "Too many requests from this IP, please try again later.",
-      statusCode: 429
-    })
-  }
+      statusCode: 429,
+    });
+  },
 });
 
 module.exports = {
-  limiter
-}
+  limiter,
+};
