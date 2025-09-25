@@ -13,7 +13,7 @@ class ValidationError extends CustomError {
   constructor(message, fields) {
     super(400, message);
     this.name = "ValidationError";
-    this.fields = fields
+    this.fields = fields;
   }
 }
 

@@ -147,6 +147,74 @@ function createValidationMiddleware(schema) {
 }
 
 /**
+ * Validate query parameters for movies list endpoint
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object  
+ * @param {Function} next - Express next function
+ */
+function validateMoviesQuery(req, res, next) {
+  const errors = [];
+  const { query } = req;
+
+  // Validate pagination parameters
+  if (query.page && (isNaN(query.page) || parseInt(query.page) < 1)) {
+    errors.push("page must be a positive integer");
+  }
+
+  if (query.limit && (isNaN(query.limit) || parseInt(query.limit) < 1)) {
+    errors.push("limit must be a positive integer");
+  }
+
+  // Validate sorting parameters
+  const allowedSortFields = ["title", "runtime_in_minutes", "rating", "created_at", "updated_at"];
+  if (query.sortBy && !allowedSortFields.includes(query.sortBy)) {
+    errors.push(`sortBy must be one of: ${allowedSortFields.join(", ")}`);
+  }
+
+  const allowedSortOrders = ["asc", "desc"];
+  if (query.sortOrder && !allowedSortOrders.includes(query.sortOrder.toLowerCase())) {
+    errors.push("sortOrder must be 'asc' or 'desc'");
+  }
+
+  // Validate filter parameters
+  if (query.title && typeof query.title !== "string") {
+    errors.push("title filter must be a string");
+  }
+
+  const allowedRatings = ["G", "PG", "PG-13", "R", "NC-17"];
+  if (query.rating && !allowedRatings.includes(query.rating)) {
+    errors.push(`rating must be one of: ${allowedRatings.join(", ")}`);
+  }
+
+  if (query.minRuntime && (isNaN(query.minRuntime) || parseInt(query.minRuntime) < 0)) {
+    errors.push("minRuntime must be a non-negative number");
+  }
+
+  if (query.maxRuntime && (isNaN(query.maxRuntime) || parseInt(query.maxRuntime) < 0)) {
+    errors.push("maxRuntime must be a non-negative number");
+  }
+
+  if (query.minRuntime && query.maxRuntime && parseInt(query.minRuntime) > parseInt(query.maxRuntime)) {
+    errors.push("minRuntime cannot be greater than maxRuntime");
+  }
+
+  if (query.year && (isNaN(query.year) || parseInt(query.year) < 1800 || parseInt(query.year) > new Date().getFullYear() + 10)) {
+    errors.push("year must be a valid year");
+  }
+
+  // Validate is_showing parameter
+  if (query.is_showing && !["true", "false"].includes(query.is_showing.toLowerCase())) {
+    errors.push("is_showing must be 'true' or 'false'");
+  }
+
+  if (errors.length > 0) {
+    throw new ValidationError(errors.join("; "));
+  }
+
+  next();
+}
+
+/**
  * Common validation schemas
  */
 const schemas = {
@@ -171,5 +239,6 @@ const schemas = {
 
 module.exports = {
   createValidationMiddleware,
+  validateMoviesQuery,
   schemas
 };
