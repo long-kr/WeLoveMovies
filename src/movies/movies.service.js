@@ -1,20 +1,67 @@
 const knex = require("../db/connection");
-const mapProperties = require("../utils/map-properties");
+const { mapProperties, buildMoviesQuery } = require("../utils");
 
-//list
-function list () {
-  return knex("movies")
-    .select("*");
-};
 
-//list where movies are showing
-function listShowing () {
+/**
+ * Get paginated and filtered list of movies
+ * @param {Object} options - Query options
+ * @returns {Promise<Object>} - Movies data with pagination info
+ */
+async function list(options = {}) {
+  const {
+    filters = {},
+    pagination = {},
+    isShowing = false
+  } = options;
+
+  // Set default pagination values
+  const page = parseInt(pagination.page) || 1;
+  const limit = Math.min(parseInt(pagination.limit) || 10, 50); // Max 50 items per page
+  const offset = (page - 1) * limit;
+
+  const paginationOptions = {
+    ...pagination,
+    limit,
+    offset
+  };
+
+  const { query, countQuery } = buildMoviesQuery(filters, paginationOptions, isShowing);
+
+  // Execute queries in parallel
+  const [movies, countResult] = await Promise.all([
+    query,
+    countQuery
+  ]);
+
+  const totalCount = parseInt(countResult[0].count, 10);
+  const totalPages = Math.ceil(totalCount / limit);
+
+  return {
+    data: movies,
+    pagination: {
+      page,
+      limit,
+      totalCount,
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPreviousPage: page > 1
+    }
+  };
+}
+
+// Legacy function for backward compatibility
+function listAll() {
+  return knex("movies").select("*");
+}
+
+// Legacy function for backward compatibility  
+function listShowing() {
   return knex("movies as m")
     .join("movies_theaters as mt", "m.movie_id", "mt.movie_id")
-    .select("m.title", "m.movie_id", "mt.is_showing", "m.image_url" )
+    .select("m.title", "m.movie_id", "mt.is_showing", "m.image_url")
     .where({ "mt.is_showing": true})
     .groupBy("m.title", "m.movie_id", "mt.is_showing", "m.image_url");
-};
+}
 
 //read a movies
 function read(movieId) {
@@ -61,8 +108,10 @@ function readMovieReviews(movieId) {
 
 module.exports = {
   list,
+  listAll,
   listShowing,
   read,
   readMovieTheaters,
   readMovieReviews,
+  buildMoviesQuery,
 };

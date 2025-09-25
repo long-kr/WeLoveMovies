@@ -1,6 +1,7 @@
 const service = require("./movies.service");
 const asyncErrorBoundary = require("../error/asyncErrorBoundary");
 const { NotFoundError, ValidationError, DatabaseError } = require("../error/CustomError");
+const { handleDatabaseError, parseMoviesQueryParams } = require("../utils");
 
 /**
  * Check if movie exists
@@ -29,18 +30,22 @@ async function hasMovie(req, res, next) {
 
 
 /**
- * List all movies or movies that are showing
+ * List all movies or movies that are showing with pagination and filtering
  */
 async function list(req, res) {
-  const isShowing = req.query.is_showing;
+  const { filters, pagination } = parseMoviesQueryParams(req.query);
+  const isShowing = req.query.is_showing === "true";
 
   try {
-    const data = isShowing === "true" 
-      ? await service.listShowing()
-      : await service.list();
-    res.json({ data });
+    const result = await service.list({
+      filters,
+      pagination,
+      isShowing
+    });
+    
+    res.json(result);
   } catch (error) {
-    throw new DatabaseError("Error retrieving movies list");
+    throw handleDatabaseError(error, "Error retrieving movies list");
   }
 }
 
@@ -60,7 +65,7 @@ async function readMovieTheaters(req, res) {
     const theaters = await service.readMovieTheaters(req.params.movieId);
     res.json({ data: theaters });
   } catch (error) {
-    throw new DatabaseError("Error retrieving movie theaters");
+    throw handleDatabaseError(error, "Error retrieving movie theaters");
   }
 }
 
@@ -72,7 +77,7 @@ async function readMovieReviews(req, res) {
     const reviews = await service.readMovieReviews(req.params.movieId);
     res.json({ data: reviews });
   } catch (error) {
-    throw new DatabaseError("Error retrieving movie reviews");
+    throw handleDatabaseError(error, "Error retrieving movie reviews");
   }
 };
 
