@@ -1,16 +1,24 @@
 function errorHandler(error, _, res, __) {
-  // Default error status and message
-  error.statusCode = error.statusCode || 500;
-  error.status = error.status || "error";
-
   // Determine environment
   const isProduction = process.env.NODE_ENV === "production";
 
   // Handle specific error types
-  if (error.code === "23505") {
+  if (error.name === "ValidationError") {
+    // Custom validation error
+    error.statusCode = 400;
+    error.status = "fail";
+  } else if (error.name === "NotFoundError") {
+    // Custom not found error
+    error.statusCode = 404;
+    error.status = "fail";
+  } else if (error.code === "23505") {
     // PostgreSQL unique violation
     error.statusCode = 409;
     error.message = "Duplicate entry found";
+  } else {
+    // Default error status and message
+    error.statusCode = error.statusCode || 500;
+    error.status = error.status || "error";
   }
 
   // Prepare response based on environment
@@ -40,11 +48,14 @@ function errorHandler(error, _, res, __) {
 
   // Log error in development
   if (!isProduction) {
-    console.error("Error:", {
-      message: error.message,
-      stack: error.stack,
-      code: error.code,
-    });
+    // console.log("Error:", {
+    //   message: error.message,
+    //   stack: error.stack,
+    //   code: error.code,
+    //   name: error.name,
+    //   statusCode: error.statusCode,
+    //   status: error.status,
+    // });
   }
 
   res.status(error.statusCode).json(errorResponse);

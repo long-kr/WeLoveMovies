@@ -8,8 +8,8 @@ const errorHandler = require("./error/errorHandler");
 const theatersRouter = require("./theaters/theaters.router");
 const moviesRouter = require("./movies/movies.router");
 const reviewsRouter = require("./reviews/reviews.router");
+const cacheRouter = require("./cache/cache.router");
 const { limiter } = require("./utils/ratelimiter");
-
 
 const app = express();
 
@@ -25,6 +25,7 @@ app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use("/movies", moviesRouter);
 app.use("/theaters", theatersRouter);
 app.use("/reviews", reviewsRouter);
+app.use("/cache", cacheRouter);
 
 app.use(notFound);
 app.use(errorHandler);

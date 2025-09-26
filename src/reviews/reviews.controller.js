@@ -12,9 +12,9 @@ async function hasReview(req, res, next) {
   if (!reviewId) throw new ValidationError("ReviewId is required");
 
   const review = await service.read(reviewId);
-  if (!review) {
-    throw new NotFoundError("Review cannot be found");
-  }
+
+  if (!review) throw new NotFoundError("Review cannot be found");
+
   res.locals.review = review;
   return next();
 }
