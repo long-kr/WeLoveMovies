@@ -9,21 +9,19 @@ const knex = require("../db/connection");
  */
 function buildMoviesQuery(filters = {}, pagination = {}, isShowing = false) {
   let query;
-  
+
   if (isShowing) {
     // For showing movies, we need to join with movies_theaters
-    query = knex("movies as m")
-      .join("movies_theaters as mt", "m.movie_id", "mt.movie_id")
-      .select("m.*", "mt.is_showing")
-      .where({ "mt.is_showing": true })
-      .groupBy("m.movie_id", "m.title", "m.runtime_in_minutes", "m.rating", "m.description", "m.image_url", "m.created_at", "m.updated_at", "mt.is_showing");
+    query = knex("movies as m").whereIn("m.movie_id", function () {
+      this.select("mt.movie_id").from("movies_theaters as mt").where("mt.is_showing", true);
+    });
   } else {
     query = knex("movies as m").select("*");
   }
 
   // Apply filters
   if (filters.title) {
-    query = query.where("m.title", "ilike", `%${filters.title}%`);
+    query = query.where("m.title", "like", `%${filters.title}%`);
   }
 
   if (filters.rating) {
@@ -38,14 +36,10 @@ function buildMoviesQuery(filters = {}, pagination = {}, isShowing = false) {
     query = query.where("m.runtime_in_minutes", "<=", filters.maxRuntime);
   }
 
-  if (filters.year) {
-    query = query.where(knex.raw("EXTRACT(YEAR FROM m.created_at)"), "=", filters.year);
-  }
-
   // Apply sorting
   const sortBy = pagination.sortBy || "title";
   const sortOrder = pagination.sortOrder || "asc";
-  
+
   // Validate sortBy to prevent SQL injection
   const allowedSortFields = ["title", "runtime_in_minutes", "rating", "created_at", "updated_at"];
   if (allowedSortFields.includes(sortBy)) {
@@ -68,10 +62,9 @@ function buildMoviesQuery(filters = {}, pagination = {}, isShowing = false) {
 
   return {
     query,
-    countQuery
+    countQuery,
   };
 }
-
 
 /**
  * Parse query parameters into filters and pagination options for movies
@@ -87,7 +80,6 @@ function parseMoviesQueryParams(query) {
   if (query.rating) filters.rating = query.rating;
   if (query.minRuntime) filters.minRuntime = parseInt(query.minRuntime);
   if (query.maxRuntime) filters.maxRuntime = parseInt(query.maxRuntime);
-  if (query.year) filters.year = parseInt(query.year);
 
   // Parse pagination
   if (query.page) pagination.page = parseInt(query.page);
@@ -109,16 +101,16 @@ function parseQueryParams(query, options = {}) {
     allowedFilters = [],
     allowedSortFields = [],
     defaultSortBy = "id",
-    defaultSortOrder = "asc"
+    defaultSortOrder = "asc",
   } = options;
 
   const filters = {};
   const pagination = {};
 
   // Parse filters based on allowed filters
-  allowedFilters.forEach(filter => {
+  allowedFilters.forEach((filter) => {
     if (query[filter]) {
-      if (filter.includes("Runtime") || filter.includes("year") || filter.includes("page") || filter.includes("limit")) {
+      if (filter.includes("Runtime") || filter.includes("page") || filter.includes("limit")) {
         filters[filter] = parseInt(query[filter]);
       } else {
         filters[filter] = query[filter];
@@ -129,14 +121,14 @@ function parseQueryParams(query, options = {}) {
   // Parse pagination
   if (query.page) pagination.page = parseInt(query.page);
   if (query.limit) pagination.limit = parseInt(query.limit);
-  
+
   // Parse sorting
   if (query.sortBy && allowedSortFields.includes(query.sortBy)) {
     pagination.sortBy = query.sortBy;
   } else {
     pagination.sortBy = defaultSortBy;
   }
-  
+
   if (query.sortOrder && ["asc", "desc"].includes(query.sortOrder.toLowerCase())) {
     pagination.sortOrder = query.sortOrder.toLowerCase();
   } else {
@@ -153,20 +145,15 @@ function parseQueryParams(query, options = {}) {
  * @returns {Object} - Sanitized pagination object
  */
 function sanitizePagination(pagination, options = {}) {
-  const {
-    defaultPage = 1,
-    defaultLimit = 10,
-    maxLimit = 50,
-    minLimit = 1
-  } = options;
+  const { defaultPage = 1, defaultLimit = 10, maxLimit = 50, minLimit = 1 } = options;
 
   const page = Math.max(1, parseInt(pagination.page) || defaultPage);
   const limit = Math.min(maxLimit, Math.max(minLimit, parseInt(pagination.limit) || defaultLimit));
-  
+
   return {
     page,
     limit,
-    offset: (page - 1) * limit
+    offset: (page - 1) * limit,
   };
 }
 
@@ -174,6 +161,5 @@ module.exports = {
   buildMoviesQuery,
   parseMoviesQueryParams,
   parseQueryParams,
-  sanitizePagination
+  sanitizePagination,
 };
-

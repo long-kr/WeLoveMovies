@@ -56,7 +56,7 @@ function createValidationMiddleware(schema) {
 
     // Validate required fields
     if (schema.required) {
-      schema.required.forEach(field => {
+      schema.required.forEach((field) => {
         if (data[field] === undefined || data[field] === null || data[field] === "") {
           errors.push(`${field} is required`);
         }
@@ -65,8 +65,8 @@ function createValidationMiddleware(schema) {
 
     // Validate anyOf fields (at least one must be present)
     if (schema.anyOf) {
-      const hasAnyRequired = schema.anyOf.some(field =>
-        data[field] !== undefined && data[field] !== null && data[field] !== ""
+      const hasAnyRequired = schema.anyOf.some(
+        (field) => data[field] !== undefined && data[field] !== null && data[field] !== ""
       );
 
       if (!hasAnyRequired) {
@@ -76,7 +76,7 @@ function createValidationMiddleware(schema) {
 
     // Validate field types and constraints
     if (schema.fields) {
-      Object.keys(schema.fields).forEach(field => {
+      Object.keys(schema.fields).forEach((field) => {
         const value = data[field];
         const rules = schema.fields?.[field] || {};
 
@@ -132,7 +132,7 @@ function createValidationMiddleware(schema) {
     // Validate for unknown fields
     if (schema.strict) {
       const allowedFields = [...(schema.required || []), ...Object.keys(schema.fields || {})];
-      const unknownFields = Object.keys(data).filter(field => !allowedFields.includes(field));
+      const unknownFields = Object.keys(data).filter((field) => !allowedFields.includes(field));
       if (unknownFields.length > 0) {
         errors.push(`Unknown field(s): ${unknownFields.join(", ")}`);
       }
@@ -149,7 +149,7 @@ function createValidationMiddleware(schema) {
 /**
  * Validate query parameters for movies list endpoint
  * @param {Object} req - Express request object
- * @param {Object} res - Express response object  
+ * @param {Object} res - Express response object
  * @param {Function} next - Express next function
  */
 function validateMoviesQuery(req, res, next) {
@@ -194,12 +194,12 @@ function validateMoviesQuery(req, res, next) {
     errors.push("maxRuntime must be a non-negative number");
   }
 
-  if (query.minRuntime && query.maxRuntime && parseInt(query.minRuntime) > parseInt(query.maxRuntime)) {
+  if (
+    query.minRuntime &&
+    query.maxRuntime &&
+    parseInt(query.minRuntime) > parseInt(query.maxRuntime)
+  ) {
     errors.push("minRuntime cannot be greater than maxRuntime");
-  }
-
-  if (query.year && (isNaN(query.year) || parseInt(query.year) < 1800 || parseInt(query.year) > new Date().getFullYear() + 10)) {
-    errors.push("year must be a valid year");
   }
 
   // Validate is_showing parameter
@@ -219,26 +219,26 @@ function validateMoviesQuery(req, res, next) {
  */
 const schemas = {
   reviewUpdate: {
-    anyOf: ["content", "score"],  // At least one of these must be present
+    anyOf: ["content", "score"], // At least one of these must be present
     fields: {
       content: {
         type: "string",
         minLength: 1,
-        maxLength: 1000
+        maxLength: 1000,
       },
       score: {
         type: "number",
         min: 1,
         max: 5,
-        integer: true
-      }
+        integer: true,
+      },
     },
-    strict: true
-  }
+    strict: true,
+  },
 };
 
 module.exports = {
   createValidationMiddleware,
   validateMoviesQuery,
-  schemas
+  schemas,
 };

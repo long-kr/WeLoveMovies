@@ -1,5 +1,6 @@
 const knex = require("../db/connection");
 const { mapProperties, buildMoviesQuery } = require("../utils");
+const cache = require("../utils/cache");
 
 /**
  * Get paginated and filtered list of movies
@@ -8,6 +9,19 @@ const { mapProperties, buildMoviesQuery } = require("../utils");
  */
 async function list(options = {}) {
   const { filters = {}, pagination = {}, isShowing = false } = options;
+
+  // Generate cache key based on options
+  const cacheKey = cache.generateKey("movies:list", {
+    ...filters,
+    ...pagination,
+    isShowing: isShowing.toString(),
+  });
+
+  // Try to get from cache first
+  const cachedResult = cache.get(cacheKey);
+  if (cachedResult) {
+    return cachedResult;
+  }
 
   // Set default pagination values
   const page = parseInt(pagination.page) || 1;
@@ -28,7 +42,7 @@ async function list(options = {}) {
   const totalCount = parseInt(countResult[0].count, 10);
   const totalPages = Math.ceil(totalCount / limit);
 
-  return {
+  const result = {
     data: movies,
     pagination: {
       page,
@@ -39,6 +53,11 @@ async function list(options = {}) {
       hasPreviousPage: page > 1,
     },
   };
+
+  // Cache the result for 5 minutes
+  cache.set(cacheKey, result, 300000);
+
+  return result;
 }
 
 // Legacy function for backward compatibility
@@ -57,16 +76,47 @@ function listShowing() {
 
 //read a movies
 function read(movieId) {
-  return knex("movies").select("*").where({ movie_id: movieId }).first();
+  const cacheKey = cache.generateKey("movies:read", { movieId });
+
+  // Try to get from cache first
+  const cachedResult = cache.get(cacheKey);
+  if (cachedResult) {
+    return Promise.resolve(cachedResult);
+  }
+
+  return knex("movies")
+    .select("*")
+    .where({ movie_id: movieId })
+    .first()
+    .then((movie) => {
+      if (movie) {
+        // Cache the result for 10 minutes (movies don't change often)
+        cache.set(cacheKey, movie, 600000);
+      }
+      return movie;
+    });
 }
 
 //theaters have movie
 function readMovieTheaters(movieId) {
+  const cacheKey = cache.generateKey("movies:theaters", { movieId });
+
+  // Try to get from cache first
+  const cachedResult = cache.get(cacheKey);
+  if (cachedResult) {
+    return Promise.resolve(cachedResult);
+  }
+
   return knex("movies as m")
     .join("movies_theaters as mt", "m.movie_id", "mt.movie_id")
     .join("theaters as t", "mt.theater_id", "t.theater_id")
     .select("t.*", "mt.is_showing", "m.movie_id")
-    .where({ "m.movie_id": movieId });
+    .where({ "m.movie_id": movieId })
+    .then((theaters) => {
+      // Cache the result for 5 minutes
+      cache.set(cacheKey, theaters, 300000);
+      return theaters;
+    });
 }
 
 //reviews of movie
@@ -80,6 +130,14 @@ const addCritic = mapProperties({
 });
 
 function readMovieReviews(movieId) {
+  const cacheKey = cache.generateKey("movies:reviews", { movieId });
+
+  // Try to get from cache first
+  const cachedResult = cache.get(cacheKey);
+  if (cachedResult) {
+    return Promise.resolve(cachedResult);
+  }
+
   return knex("movies as m")
     .join("reviews as r", "m.movie_id", "r.movie_id")
     .join("critics as c", "r.critic_id", "c.critic_id")
@@ -98,6 +156,9 @@ function readMovieReviews(movieId) {
       datas.forEach((data) => {
         result.push(addCritic(data));
       });
+
+      // Cache the result for 2 minutes (reviews change more frequently)
+      cache.set(cacheKey, result, 120000);
       return result;
     });
 }
