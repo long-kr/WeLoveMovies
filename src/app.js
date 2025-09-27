@@ -3,29 +3,32 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet").default;
 
-const notFound = require("./error/notFound");
-const errorHandler = require("./error/errorHandler");
-const theatersRouter = require("./theaters/theaters.router");
-const moviesRouter = require("./movies/movies.router");
-const reviewsRouter = require("./reviews/reviews.router");
-const cacheRouter = require("./cache/cache.router");
-const { limiter } = require("./utils/ratelimiter");
+const config = require("./config");
+const { notFound, errorHandler, rateLimiter } = require("./middleware");
+
+// Feature routers
+const { router: theatersRouter } = require("./features/theaters");
+const { router: moviesRouter } = require("./features/movies");
+const { router: reviewsRouter } = require("./features/reviews");
+const { router: cacheRouter } = require("./features/cache");
+const { router: tmdbRouter } = require("./features/tmdb");
 
 const app = express();
 
-app.use(limiter);
-app.use(helmet());
+app.use(rateLimiter.limiter);
+app.use(helmet(config.security.helmet));
 
-app.options("*", cors());
-app.use(cors());
+app.options("*", cors(config.security.cors));
+app.use(cors(config.security.cors));
 
-app.use(express.json({ limit: "10kb" }));
-app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+app.use(express.json({ limit: config.limits.requestBodySize }));
+app.use(express.urlencoded({ extended: true, limit: config.limits.requestBodySize }));
 
 app.use("/movies", moviesRouter);
 app.use("/theaters", theatersRouter);
 app.use("/reviews", reviewsRouter);
 app.use("/cache", cacheRouter);
+app.use("/tmdb", tmdbRouter);
 
 app.use(notFound);
 app.use(errorHandler);
