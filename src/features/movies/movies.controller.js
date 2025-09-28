@@ -28,6 +28,7 @@ async function list(req, res) {
 
   if (isShowing) {
     const result = await service.listShowing();
+    console.log(result);
     res.json(result);
     return;
   }
