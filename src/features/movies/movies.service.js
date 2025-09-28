@@ -60,16 +60,29 @@ async function list(options = {}) {
   return result;
 }
 
-// Legacy function for backward compatibility
-function listAll() {
-  return knex("movies").select("*");
-}
-
-// Legacy function for backward compatibility
+/**
+ * Get all movies that are currently showing without pagination
+ * @returns {Promise<Array>} - All movies currently showing
+ */
 function listShowing() {
-  return knex("movies as m").whereIn("m.movie_id", function () {
-    this.select("mt.movie_id").from("movies_theaters as mt").where("mt.is_showing", true);
-  });
+  const cacheKey = cache.generateKey("movies:showing", {});
+
+  // Try to get from cache first
+  const cachedResult = cache.get(cacheKey);
+  if (cachedResult) {
+    return Promise.resolve(cachedResult);
+  }
+
+  return knex("movies as m")
+    .whereIn("m.movie_id", function () {
+      this.select("mt.movie_id").from("movies_theaters as mt").where("mt.is_showing", true);
+    })
+    .orderBy("m.title", "asc")
+    .then((movies) => {
+      // Cache the result for 5 minutes (showing status changes more frequently)
+      cache.set(cacheKey, movies, 300000);
+      return movies;
+    });
 }
 
 //read a movies
@@ -163,7 +176,6 @@ function readMovieReviews(movieId) {
 
 module.exports = {
   list,
-  listAll,
   listShowing,
   read,
   readMovieTheaters,

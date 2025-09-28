@@ -4,6 +4,8 @@ const { methodNotAllowed, validateMoviesQuery } = require("../../middleware");
 
 router.route("/").get(validateMoviesQuery, controller.list).all(methodNotAllowed);
 
+router.route("/showing").get(controller.listShowing).all(methodNotAllowed);
+
 router.route("/:movieId([0-9]+)").get(controller.read).all(methodNotAllowed);
 
 router.route("/:movieId([0-9]+)/theaters").get(controller.readMovieTheaters).all(methodNotAllowed);

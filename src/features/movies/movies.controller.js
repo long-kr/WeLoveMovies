@@ -26,13 +26,6 @@ async function list(req, res) {
   const { filters, pagination } = parseMoviesQueryParams(req.query);
   const isShowing = req.query.is_showing === "true";
 
-  if (isShowing) {
-    const result = await service.listShowing();
-    console.log(result);
-    res.json(result);
-    return;
-  }
-
   const result = await service.list({
     filters,
     pagination,
@@ -40,6 +33,14 @@ async function list(req, res) {
   });
 
   res.json(result);
+}
+
+/**
+ * List all movies without pagination
+ */
+async function listShowing(req, res) {
+  const movies = await service.listShowing();
+  res.json({ data: movies });
 }
 
 /**
@@ -67,6 +68,7 @@ async function readMovieReviews(req, res) {
 
 module.exports = {
   list: [asyncErrorBoundary(list)],
+  listShowing: [asyncErrorBoundary(listShowing)],
   read: [asyncErrorBoundary(hasMovie), asyncErrorBoundary(read)],
   readMovieTheaters: [asyncErrorBoundary(hasMovie), asyncErrorBoundary(readMovieTheaters)],
   readMovieReviews: [asyncErrorBoundary(hasMovie), asyncErrorBoundary(readMovieReviews)],
