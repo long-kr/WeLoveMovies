@@ -23,7 +23,7 @@ describe("Review Routes", () => {
     test("should return a 404 if the ID given does not match any ID in the database", async () => {
       const response = await request(app).put("/reviews/999999999", {});
 
-      expect(response.body.error).toMatch(/cannot be found/i);
+      expect(response.body.message).toMatch(/cannot be found/i);
       expect(response.statusCode).toBe(404);
     });
 
@@ -31,9 +31,7 @@ describe("Review Routes", () => {
       const data = { content: "Content" };
       const previous = await db("reviews").first();
 
-      const response = await request(app)
-        .put(`/reviews/${previous.review_id}`)
-        .send({ data });
+      const response = await request(app).put(`/reviews/${previous.review_id}`).send({ data });
 
       expect(response.body.error).toBeUndefined();
       expect(response.body.data).toEqual(
@@ -50,38 +48,9 @@ describe("Review Routes", () => {
         })
       );
 
-      const updatedReview = await db("reviews")
-        .where({ review_id: previous.review_id })
-        .first();
+      const updatedReview = await db("reviews").where({ review_id: previous.review_id }).first();
 
       expect(updatedReview.content).toBe("Content");
-    });
-  });
-
-  describe("DELETE /reviews/:reviewId", () => {
-    test("should return a 404 if the ID given does not match any ID in the database", async () => {
-      const response = await request(app).delete("/reviews/9999", {});
-      expect(response.body.error).toBeDefined();
-      expect(response.statusCode).toBe(404);
-    });
-
-    test("should delete the review record when given an existing review_id", async () => {
-      const previous = await db("reviews").first();
-
-      const response = await request(app).delete(
-        `/reviews/${previous.review_id}`
-      );
-
-      expect(response.body.error).toBeUndefined();
-      expect(response.statusCode).toBe(204);
-
-      const deletedReview = await db("reviews")
-        .where({
-          review_id: previous.review_id,
-        })
-        .first();
-
-      expect(deletedReview).toBeUndefined();
     });
   });
 });

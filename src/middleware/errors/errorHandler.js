@@ -1,3 +1,5 @@
+const { HTTP_STATUS, MESSAGES } = require("../../constants");
+
 function errorHandler(error, _, res, __) {
   // Determine environment
   const isProduction = process.env.NODE_ENV === "production";
@@ -5,19 +7,19 @@ function errorHandler(error, _, res, __) {
   // Handle specific error types
   if (error.name === "ValidationError") {
     // Custom validation error
-    error.statusCode = 400;
+    error.statusCode = HTTP_STATUS.BAD_REQUEST;
     error.status = "fail";
   } else if (error.name === "NotFoundError") {
     // Custom not found error
-    error.statusCode = 404;
+    error.statusCode = HTTP_STATUS.NOT_FOUND;
     error.status = "fail";
   } else if (error.code === "23505") {
     // PostgreSQL unique violation
-    error.statusCode = 409;
+    error.statusCode = HTTP_STATUS.CONFLICT;
     error.message = "Duplicate entry found";
   } else {
     // Default error status and message
-    error.statusCode = error.statusCode || 500;
+    error.statusCode = error.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR;
     error.status = error.status || "error";
   }
 
@@ -35,14 +37,14 @@ function errorHandler(error, _, res, __) {
 
   // Handle database connection errors
   if (error.code === "ECONNREFUSED") {
-    errorResponse.message = "Database connection failed";
-    error.statusCode = 503;
+    errorResponse.message = MESSAGES.ERRORS.DATABASE_ERROR;
+    error.statusCode = HTTP_STATUS.SERVICE_UNAVAILABLE;
   }
 
   // Handle validation errors from knex/postgres
   if (error.code === "23502") {
     // not null violation
-    error.statusCode = 400;
+    error.statusCode = HTTP_STATUS.BAD_REQUEST;
     errorResponse.message = "Missing required fields";
   }
 

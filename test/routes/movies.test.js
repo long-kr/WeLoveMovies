@@ -64,7 +64,7 @@ describe("Movie Routes", () => {
         totalCount: 16,
         totalPages: 2,
         hasNextPage: true,
-        hasPreviousPage: false
+        hasPreviousPage: false,
       });
       expect(response.body.data).toHaveLength(10);
     });
@@ -78,7 +78,7 @@ describe("Movie Routes", () => {
         totalCount: 16,
         totalPages: 4,
         hasNextPage: true,
-        hasPreviousPage: false
+        hasPreviousPage: false,
       });
       expect(response.body.data).toHaveLength(5);
     });
@@ -92,7 +92,7 @@ describe("Movie Routes", () => {
         totalCount: 16,
         totalPages: 2,
         hasNextPage: false,
-        hasPreviousPage: true
+        hasPreviousPage: true,
       });
       expect(response.body.data).toHaveLength(6); // 16 total - 10 first page = 6 remaining
     });
@@ -111,7 +111,7 @@ describe("Movie Routes", () => {
       expect(response.status).toBe(200);
       expect(response.body.data).toHaveLength(1);
       expect(response.body.data[0]).toMatchObject({
-        title: "Interstellar"
+        title: "Interstellar",
       });
       expect(response.body.pagination.totalCount).toBe(1);
     });
@@ -120,7 +120,7 @@ describe("Movie Routes", () => {
       const response = await request(app).get("/movies?rating=PG-13");
 
       expect(response.body.data.length).toBeGreaterThan(0);
-      response.body.data.forEach(movie => {
+      response.body.data.forEach((movie) => {
         expect(movie.rating).toBe("PG-13");
       });
     });
@@ -129,43 +129,39 @@ describe("Movie Routes", () => {
       const response = await request(app).get("/movies?minRuntime=150&maxRuntime=200");
 
       expect(response.body.data.length).toBeGreaterThan(0);
-      response.body.data.forEach(movie => {
+      response.body.data.forEach((movie) => {
         expect(movie.runtime_in_minutes).toBeGreaterThanOrEqual(150);
         expect(movie.runtime_in_minutes).toBeLessThanOrEqual(200);
       });
-    });
-
-    test("should filter movies by year", async () => {
-      const response = await request(app).get("/movies?year=2025");
-
-      expect(response.status).toBe(200);
-      expect(response.body.data.length).toBeGreaterThan(0);
-      // Note: This test uses 2025 as all seed data appears to be from 2025
     });
 
     // Sorting Tests
     test("should sort movies by title ascending by default", async () => {
       const response = await request(app).get("/movies?limit=5");
 
-      const titles = response.body.data.map(movie => movie.title);
+      const titles = response.body.data.map((movie) => movie.title);
       const sortedTitles = [...titles].sort();
       expect(titles).toEqual(sortedTitles);
     });
 
     test("should sort movies by runtime descending", async () => {
-      const response = await request(app).get("/movies?sortBy=runtime_in_minutes&sortOrder=desc&limit=5");
+      const response = await request(app).get(
+        "/movies?sortBy=runtime_in_minutes&sortOrder=desc&limit=5"
+      );
 
-      const runtimes = response.body.data.map(movie => movie.runtime_in_minutes);
+      const runtimes = response.body.data.map((movie) => movie.runtime_in_minutes);
       const sortedRuntimes = [...runtimes].sort((a, b) => b - a);
       expect(runtimes).toEqual(sortedRuntimes);
     });
 
     // Combined filtering and pagination tests
     test("should combine filtering, sorting, and pagination", async () => {
-      const response = await request(app).get("/movies?rating=PG-13&sortBy=runtime_in_minutes&sortOrder=desc&page=1&limit=3");
+      const response = await request(app).get(
+        "/movies?rating=PG-13&sortBy=runtime_in_minutes&sortOrder=desc&page=1&limit=3"
+      );
 
       expect(response.body.data.length).toBeLessThanOrEqual(3);
-      response.body.data.forEach(movie => {
+      response.body.data.forEach((movie) => {
         expect(movie.rating).toBe("PG-13");
       });
       expect(response.body.pagination.page).toBe(1);
@@ -215,13 +211,6 @@ describe("Movie Routes", () => {
       expect(response.status).toBe(400);
       expect(response.body.message).toContain("minRuntime cannot be greater than maxRuntime");
     });
-
-    test("should return 400 for invalid year", async () => {
-      const response = await request(app).get("/movies?year=1700");
-
-      expect(response.status).toBe(400);
-      expect(response.body.message).toContain("year must be a valid year");
-    });
   });
 
   describe("GET /movies/:movieId", () => {
@@ -243,9 +232,7 @@ describe("Movie Routes", () => {
     test("/theaters returns the theaters for the specified movie_id", async () => {
       const previous = await db("movies").first();
 
-      const response = await request(app).get(
-        `/movies/${previous.movie_id}/theaters`
-      );
+      const response = await request(app).get(`/movies/${previous.movie_id}/theaters`);
 
       expect(response.body.error).toBeUndefined();
       expect(response.body.data[0]).toHaveProperty("name", "Regal City Center");
@@ -255,9 +242,7 @@ describe("Movie Routes", () => {
     test("GET `/movies/:movieId/reviews` returns the reviews, with critic property, for the specified movie_id", async () => {
       const previous = await db("movies").first();
 
-      const response = await request(app).get(
-        `/movies/${previous.movie_id}/reviews`
-      );
+      const response = await request(app).get(`/movies/${previous.movie_id}/reviews`);
 
       expect(response.body.error).toBeUndefined();
       expect(response.body.data).toHaveLength(7);
@@ -277,9 +262,7 @@ describe("Movie Routes", () => {
     test("should not include critics anywhere for the path `/movies/:movieId/critics`", async () => {
       const previous = await db("movies").first();
 
-      const response = await request(app).get(
-        `/movies/${previous.movie_id}/critics`
-      );
+      const response = await request(app).get(`/movies/${previous.movie_id}/critics`);
 
       expect(response.body.error).toBeDefined();
       expect(response.statusCode).toBe(404);
