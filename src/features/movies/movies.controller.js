@@ -26,6 +26,12 @@ async function list(req, res) {
   const { filters, pagination } = parseMoviesQueryParams(req.query);
   const isShowing = req.query.is_showing === "true";
 
+  if (isShowing) {
+    const result = await service.listShowing();
+    res.json(result);
+    return;
+  }
+
   const result = await service.list({
     filters,
     pagination,
