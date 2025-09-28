@@ -67,6 +67,7 @@ const config = {
       enabled: process.env.API_KEY_ENABLED === "true",
       hash: process.env.API_KEY_HASH,
       secret: process.env.API_KEY_SECRET || "default-secret-change-in-production",
+      algorithm: "sha256",
       required: process.env.API_KEY_REQUIRED !== "false", // Default to true
       skipPaths: (process.env.API_KEY_SKIP_PATHS || "").split(",").filter(Boolean),
     },

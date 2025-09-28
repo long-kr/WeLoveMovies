@@ -2,10 +2,10 @@
 
 /**
  * API Key Generation Utility
- * 
+ *
  * This script helps generate API keys and their corresponding hashes
  * for use with the API key authentication system.
- * 
+ *
  * Usage:
  *   node src/scripts/generateApiKey.js
  *   node src/scripts/generateApiKey.js --key "your-custom-key"
@@ -13,7 +13,7 @@
  */
 
 require("dotenv").config();
-const { generateApiKey, generateApiKeyHash, generateApiKeyPair } = require("../middleware/security/apiKeyAuth");
+const { generateApiKeyHash, generateApiKeyPair } = require("../middleware/security/apiKeyAuth");
 
 function printUsage() {
   console.log(`
@@ -44,11 +44,11 @@ Environment Variables Required:
 
 function main() {
   const args = process.argv.slice(2);
-  
+
   // Parse arguments
   let customKey = null;
   let keyLength = 32;
-  
+
   for (let i = 0; i < args.length; i++) {
     switch (args[i]) {
       case "--help":
@@ -73,13 +73,13 @@ function main() {
         return;
     }
   }
-  
+
   try {
     if (customKey) {
       // Generate hash for existing key
       console.log("Generating hash for provided API key...\n");
       const hash = generateApiKeyHash(customKey);
-      
+
       console.log("API Key Configuration:");
       console.log("=====================");
       console.log(`API Key: ${customKey}`);
@@ -95,12 +95,11 @@ function main() {
       console.log("   - Store the API key securely and share it only with authorized clients");
       console.log("   - Store the hash in your environment variables, not the key itself");
       console.log("   - Never commit the actual API key to version control");
-      
     } else {
       // Generate new key pair
       console.log(`Generating new API key (${keyLength} characters)...\n`);
       const { key, hash } = generateApiKeyPair(keyLength);
-      
+
       console.log("API Key Configuration:");
       console.log("=====================");
       console.log(`API Key: ${key}`);
@@ -114,19 +113,18 @@ function main() {
       console.log("");
       console.log("Client Usage Examples:");
       console.log("=====================");
-      console.log("curl -H \"x-api-key: " + key + "\" http://localhost:5000/movies");
-      console.log("curl -H \"Authorization: Bearer " + key + "\" http://localhost:5000/movies");
-      console.log("curl -H \"Authorization: ApiKey " + key + "\" http://localhost:5000/movies");
+      console.log('curl -H "x-api-key: ' + key + '" http://localhost:5000/movies');
+      console.log('curl -H "Authorization: Bearer ' + key + '" http://localhost:5000/movies');
+      console.log('curl -H "Authorization: ApiKey ' + key + '" http://localhost:5000/movies');
       console.log("");
       console.log("⚠️  SECURITY WARNING:");
       console.log("   - Store this API key securely and share it only with authorized clients");
       console.log("   - Add the hash to your .env file, not the key itself");
       console.log("   - Never commit the actual API key to version control");
     }
-    
   } catch (error) {
     console.error("Error generating API key:", error.message);
-    
+
     if (error.message.includes("API key secret not configured")) {
       console.log("\nTo fix this error:");
       console.log("1. Add API_KEY_SECRET to your .env file");

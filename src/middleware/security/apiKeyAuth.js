@@ -18,12 +18,13 @@ function generateApiKeyHash(apiKey) {
   }
 
   const secret = config.security.apiKey.secret;
+  const algorithm = config.security.apiKey.algorithm;
 
   if (!secret) {
     throw new Error("API key secret not configured");
   }
 
-  return crypto.createHmac("sha256", secret).update(apiKey).digest("hex");
+  return crypto.createHmac(algorithm, secret).update(apiKey).digest("hex");
 }
 
 /**
@@ -162,21 +163,13 @@ function createApiKeyMiddleware(options = { required: true, skipPaths: [] }) {
 }
 
 /**
- * Utility function to generate a new API key
- * @param {number} length - Length of the API key (default: 32)
- * @returns {string} - Generated API key
- */
-function generateApiKey(length = 32) {
-  return crypto.randomBytes(length).toString("hex");
-}
-
-/**
  * Utility function to generate API key and its hash
  * @param {number} length - Length of the API key (default: 32)
  * @returns {Object} - Object containing key and hash
  */
 function generateApiKeyPair(length = 32) {
-  const apiKey = generateApiKey(length);
+  const apiKey = crypto.randomBytes(length).toString("hex");
+
   const hash = generateApiKeyHash(apiKey);
 
   return {
@@ -187,7 +180,6 @@ function generateApiKeyPair(length = 32) {
 
 module.exports = {
   createApiKeyMiddleware,
-  generateApiKey,
   generateApiKeyHash,
   generateApiKeyPair,
   validateApiKey,

@@ -29,13 +29,12 @@ app.use(cors(config.security.cors));
 app.use(express.json({ limit: config.limits.requestBodySize }));
 app.use(express.urlencoded({ extended: true, limit: config.limits.requestBodySize }));
 
-app.use(createApiKeyMiddleware);
-
 app.use("/movies", moviesRouter);
 app.use("/theaters", theatersRouter);
 app.use("/reviews", reviewsRouter);
 app.use("/cache", cacheRouter);
-app.use("/tmdb", tmdbRouter);
+
+app.use("/tmdb", createApiKeyMiddleware, tmdbRouter);
 
 app.use(notFound);
 app.use(errorHandler);
