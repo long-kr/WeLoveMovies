@@ -3,7 +3,10 @@ const app = require("./app");
 const knex = require("./db/connection");
 const { cacheManager } = require("./lib/cache");
 
-const listener = () => console.log(`Listening on Port ${config.server.port}!`);
+const listener = () => {
+  console.log("NODE_ENV: ", process.env.NODE_ENV);
+  console.log(`Listening on Port: ${config.server.port}!`);
+};
 
 knex.migrate
   .latest()
