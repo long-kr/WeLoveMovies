@@ -2,8 +2,7 @@
  * Cache functionality tests
  */
 
-const cache = require("../src/utils/cache");
-const cacheManager = require("../src/utils/cacheManager");
+const { cache, cacheManager } = require("../src/lib/cache");
 
 describe("Cache Tests", () => {
   beforeEach(() => {

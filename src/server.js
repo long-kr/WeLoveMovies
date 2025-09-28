@@ -1,10 +1,12 @@
-const { PORT = 5000 } = process.env;
-
+const config = require("./config");
 const app = require("./app");
 const knex = require("./db/connection");
-const cacheManager = require("./utils/cacheManager");
+const { cacheManager } = require("./lib/cache");
 
-const listener = () => console.log(`Listening on Port ${PORT}!`);
+const listener = () => {
+  console.log("NODE_ENV: ", process.env.NODE_ENV);
+  console.log(`Listening on Port: ${config.server.port}!`);
+};
 
 knex.migrate
   .latest()
@@ -12,15 +14,8 @@ knex.migrate
     console.log("migrations", migrations);
 
     // Warm up cache after migrations
-    cacheManager
-      .warmUpCache()
-      .then(() => {
-        console.log("Cache warmed up successfully");
-      })
-      .catch((error) => {
-        console.warn("Cache warmup failed:", error.message);
-      });
+    cacheManager.warmUpCache();
 
-    app.listen(PORT, listener);
+    app.listen(config.server.port, listener);
   })
   .catch(console.error);
