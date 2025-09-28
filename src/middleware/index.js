@@ -11,6 +11,7 @@ const methodNotAllowed = require("./errors/methodNotAllowed");
 
 // Security middleware
 const rateLimiter = require("./security/rateLimiter");
+const apiKeyAuth = require("./security/apiKeyAuth");
 
 // Validation middleware
 const { createValidationMiddleware, validateMoviesQuery, schemas } = require("../lib/validation");
@@ -24,6 +25,7 @@ module.exports = {
 
   // Security
   rateLimiter,
+  apiKeyAuth,
 
   // Validation
   createValidationMiddleware,

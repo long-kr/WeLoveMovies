@@ -63,6 +63,13 @@ const config = {
     helmet: {
       contentSecurityPolicy: process.env.NODE_ENV === "production",
     },
+    apiKey: {
+      enabled: process.env.API_KEY_ENABLED === "true",
+      hash: process.env.API_KEY_HASH,
+      secret: process.env.API_KEY_SECRET || "default-secret-change-in-production",
+      required: process.env.API_KEY_REQUIRED !== "false", // Default to true
+      skipPaths: (process.env.API_KEY_SKIP_PATHS || "").split(",").filter(Boolean),
+    },
   },
 
   // External APIs

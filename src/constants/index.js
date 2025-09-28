@@ -72,6 +72,8 @@ const ERROR_TYPES = {
   DATABASE_ERROR: "DatabaseError",
   FORBIDDEN_ERROR: "ForbiddenError",
   CUSTOM_ERROR: "CustomError",
+  API_KEY_ERROR: "ApiKeyError",
+  UNAUTHORIZED_ERROR: "UnauthorizedError",
 };
 
 // Database Table Names
@@ -108,6 +110,9 @@ const MESSAGES = {
     ROUTE_NOT_FOUND: "Route not found",
     TMDB_API_ERROR: "Error fetching data from TMDb API",
     CACHE_WARMUP_FAILED: "Cache warmup failed",
+    API_KEY_MISSING: "API key is required. Please provide a valid API key in the x-api-key header or Authorization header",
+    API_KEY_INVALID: "Invalid API key provided. Please check your API key and try again",
+    API_KEY_UNAUTHORIZED: "Unauthorized access. Valid API key required",
   },
 };
 
