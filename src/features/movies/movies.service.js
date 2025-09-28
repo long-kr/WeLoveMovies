@@ -67,11 +67,9 @@ function listAll() {
 
 // Legacy function for backward compatibility
 function listShowing() {
-  return knex("movies as m")
-    .join("movies_theaters as mt", "m.movie_id", "mt.movie_id")
-    .select("m.title", "m.movie_id", "mt.is_showing", "m.image_url")
-    .where({ "mt.is_showing": true })
-    .groupBy("m.title", "m.movie_id", "mt.is_showing", "m.image_url");
+  return knex("movies as m").whereIn("m.movie_id", function () {
+    this.select("mt.movie_id").from("movies_theaters as mt").where("mt.is_showing", true);
+  });
 }
 
 //read a movies
