@@ -36,6 +36,8 @@ app.use("/cache", cacheRouter);
 
 app.use("/tmdb", createApiKeyMiddleware, tmdbRouter);
 
+app.get("/", (req, res) => res.status(200).send("ok"));
+
 app.use(notFound);
 app.use(errorHandler);
 
