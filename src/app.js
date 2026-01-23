@@ -20,11 +20,11 @@ const { router: reviewsRouter } = require("./features/reviews");
 const { router: cacheRouter } = require("./features/cache");
 const { router: tmdbRouter } = require("./features/tmdb");
 
+app.use(cors(config.security.cors));
+app.options("*", cors(config.security.cors));
+
 app.use(rateLimiter.limiter);
 app.use(helmet(config.security.helmet));
-
-app.options("*", cors(config.security.cors));
-app.use(cors(config.security.cors));
 
 app.use(express.json({ limit: config.limits.requestBodySize }));
 app.use(express.urlencoded({ extended: true, limit: config.limits.requestBodySize }));

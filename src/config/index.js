@@ -57,8 +57,25 @@ const config = {
   // Security Configuration
   security: {
     cors: {
-      origin: process.env.CORS_ORIGIN || "*",
+      origin(origin, cb) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return cb(null, true);
+
+        // Allow specific origin from environment variable
+        const origins = process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(",") : "*";
+
+        if (origins === "*") return cb(null, true);
+
+        if (origins.indexOf(origin) !== -1) {
+          return cb(null, true);
+        }
+
+        return cb(new Error("CORS policy violation"));
+      },
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
       credentials: process.env.CORS_CREDENTIALS === "true",
+
     },
     helmet: {
       contentSecurityPolicy: process.env.NODE_ENV === "production",
