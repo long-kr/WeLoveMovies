@@ -16,6 +16,6 @@ knex.migrate
     // Warm up cache after migrations
     cacheManager.warmUpCache();
 
-    app.listen(config.server.port, listener);
+    app.listen(config.server.port, "0.0.0.0", listener);
   })
   .catch(console.error);

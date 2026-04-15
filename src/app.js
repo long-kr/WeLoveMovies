@@ -36,7 +36,14 @@ app.use("/cache", cacheRouter);
 
 app.use("/tmdb", createApiKeyMiddleware, tmdbRouter);
 
-app.get("/", (req, res) => res.status(200).send("ok"));
+app.get("/", (req, res) => {
+  res.json({
+    message: "Express app running behind Nginx",
+    ip: req.ip,
+    forwardedFor: req.headers["x-forwarded-for"] || null,
+    protocol: req.headers["x-forwarded-proto"] || null
+  });
+});;
 
 app.use(notFound);
 app.use(errorHandler);
