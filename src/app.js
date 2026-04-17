@@ -20,6 +20,7 @@ const { router: reviewsRouter } = require("./features/reviews");
 const { router: cacheRouter } = require("./features/cache");
 const { router: tmdbRouter } = require("./features/tmdb");
 
+app.set('trust proxy', 1);
 app.use(cors(config.security.cors));
 app.options("*", cors(config.security.cors));
 
