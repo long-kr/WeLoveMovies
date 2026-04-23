@@ -1,34 +1,23 @@
-# Docker Compose configuration for We Love Movies Backend
-# This file defines the services needed to run the Node.js application
-
 services:
-  # Node.js application service
-  # Runs the Express.js backend application
   app:
     build: .
-    # Build the image from the current directory's Dockerfile
+
     container_name: we-love-movies-app
-    
+
     env_file:
       - .env
-
-    expose:
-      - "5000"
 
     environment:
       - NODE_ENV=production
       - PORT=5000
 
-    volumes:
-      - .:/app
-      # Mount the current directory to /app in the container for development
-      - /app/node_modules
-      # Anonymous volume for node_modules to avoid conflicts
-    
+    expose:
+      - "5000"
     networks:
+    
       - shared_proxy
+    restart: unless-stopped
 
 networks:
   shared_proxy:
     external: true
-      
